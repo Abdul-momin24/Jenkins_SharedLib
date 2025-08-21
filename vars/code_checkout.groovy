@@ -4,13 +4,14 @@ def call(String GitUrl, String GitBranch) {
         branches: [[name: "*/${GitBranch}"]],
         doGenerateSubmoduleConfigurations: false,
         extensions: [
-            [$class: 'CleanBeforeCheckout'],   // 🔑 wipes old workspace before checkout
+            [$class: 'CleanBeforeCheckout'],
             [$class: 'CheckoutOption', timeout: 20],
             [$class: 'CloneOption', noTags: false, shallow: false, depth: 0, timeout: 20]
         ],
         userRemoteConfigs: [[url: GitUrl]]
     ])
 
-    // Debug: print the commit being built
-    sh 'echo "✅ Checked out commit:" && git rev-parse HEAD'
+    // Ensure we're on the branch, not detached
+    sh "git checkout ${GitBranch}"
+    sh 'echo "✅ Checked out commit:" && git rev-parse HEAD && git branch'
 }
